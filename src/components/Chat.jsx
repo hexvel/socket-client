@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import Messages from "./Messages";
@@ -12,11 +12,16 @@ const socket = io("https://web-chat-5511.onrender.com");
 const Chat = () => {
   const { search } = useLocation();
   const navigate = useNavigate();
+  const messagesEndRef = useRef(null);
   const [params, setParams] = useState({ room: "", user: "" });
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [users, setUsers] = useState(0);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     const searchParams = Object.fromEntries(new URLSearchParams(search));
@@ -29,6 +34,8 @@ const Chat = () => {
       setMessages((prev) => [...prev, data]);
     });
   }, []);
+
+  useEffect(() => scrollToBottom(), [messages]);
 
   useEffect(() => {
     socket.on("room", ({ data: { users } }) => {
@@ -66,6 +73,7 @@ const Chat = () => {
 
       <div className={styles.messages}>
         <Messages messages={messages} name={params.name} />
+        <div ref={messagesEndRef} />
       </div>
 
       <form className={styles.form} onSubmit={handleSubmit}>
@@ -77,7 +85,6 @@ const Chat = () => {
             value={message}
             onChange={handleChange}
             autoComplete="off"
-            required
           />
         </div>
 

@@ -44,6 +44,10 @@
   background: #0d49d7;
 }
 
+.me .text:nth-last-child(1) {
+  margin-bottom: 78px;
+}
+
 .me .user {
   padding-right: 10px;
 }
